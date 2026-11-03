@@ -7,6 +7,7 @@ Experimental Apple Maps EV routing for Gen5W, installed as a **native HMG-API mo
 1. Install [NEMESIS](https://github.com/xwtk/hmg_nemesis) and [HMG-API beta6 or newer](https://github.com/VysseCodes/HMG-API/releases). NEMESIS can install HMG-API itself.
 2. Install/enable HMG-API’s **Wireless CarPlay + Android Auto** mod, apply, verify the car map and reboot. It is a separate download; confirm CarPlay works.
 3. Download **[egmp-carplay-ev-routing-v0.4.0.zip](https://github.com/isaacwisdom/egmp-carplay-ev-routing/releases/download/v0.4.0/egmp-carplay-ev-routing-v0.4.0.zip)** and copy it unchanged into `HMGAPI/updates/` on a USB stick. In HMG-API, use **Check USB updates**, install it, enable it and **Apply changes**. Remove the USB and fully reboot.
+4. **Manually delete the existing iPhone–HU pairing and pair again.** Remove the iPhone from the HU’s paired-device list, forget the HU in the iPhone’s Bluetooth and CarPlay settings, then pair again and allow CarPlay. This step is required after installation; reconnecting the existing pairing is not enough.
 
 There is **one mod download** for both supported vehicles. HMG-API selects the correct bundled profile when applying the mod and writes one active profile file; the routing code always reads that file. No manual profile choice is needed. [Detailed directions](docs/INSTALLATION.md). NEMESIS wrappers are retained under `dist/testing/` for optional testing, not as primary release downloads.
 

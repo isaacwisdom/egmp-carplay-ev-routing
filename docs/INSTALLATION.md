@@ -7,7 +7,8 @@ Requires official HMG-API **1.0.0-beta.6 or newer**, a checked car map, and its 
 1. Download [egmp-carplay-ev-routing-v0.4.0.zip](https://github.com/isaacwisdom/egmp-carplay-ev-routing/releases/download/v0.4.0/egmp-carplay-ev-routing-v0.4.0.zip). This single signed ZIP supports the listed Ioniq 5 and EV6 configurations. EV6 values are copied and unvalidated; both profiles use 77.4 kWh.
 2. Copy the ZIP unchanged into `HMGAPI/updates/` on a USB stick. Do not unzip it. HMG-API chooses the applicable profile at Apply using the HU’s model/region/firmware; the routing code reads one active file at `/system/etc/carplay.ev-routing/profile.json`.
 3. Open HMG-API > **Check USB updates**, select the package and install. Enable it and review **Apply changes**. Do not use **Install anyway** for an unsupported car/firmware.
-4. After successful apply, remove the stick and fully reboot. Connect CarPlay and open Apple Maps.
+4. After successful apply, remove the stick and fully reboot.
+5. Complete the [required iPhone re-pairing](#re-pair-your-iphone-required) below, then connect CarPlay and open Apple Maps.
 
 These follow the upstream [mod installation directions](https://github.com/VysseCodes/HMG-API/wiki/Installing-and-removing-mods). The wireless mod is also imported from a signed upstream ZIP in `HMGAPI/updates/`; the HMG-API NEMESIS installer does not bundle it.
 
@@ -29,6 +30,15 @@ If the plan has no refused hooks or unexpected changes:
 adb shell hmgapid engine apply
 adb reboot
 ```
+
+## Re-pair your iPhone (required)
+
+After installing and rebooting, **manually delete the existing pairing and pair the iPhone to the HU again**. This applies to both USB and computer installation; simply reconnecting the existing pairing is not enough.
+
+1. On the HU, delete the iPhone from the Bluetooth/phone-projection paired-device list.
+2. On the iPhone, forget the HU in both Bluetooth and CarPlay settings.
+3. Start a new pairing with the HU and accept the Bluetooth and CarPlay prompts.
+4. Connect CarPlay and open Apple Maps to set up EV routing.
 
 ## Update, disable and remove
 
