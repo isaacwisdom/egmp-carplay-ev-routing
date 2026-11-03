@@ -38,7 +38,25 @@ After installing and rebooting, **manually delete the existing pairing and pair 
 1. On the HU, delete the iPhone from the Bluetooth/phone-projection paired-device list.
 2. On the iPhone, forget the HU in both Bluetooth and CarPlay settings.
 3. Start a new pairing with the HU and accept the Bluetooth and CarPlay prompts.
-4. Connect CarPlay and open Apple Maps to set up EV routing.
+4. Connect CarPlay, then complete the Apple Maps vehicle setup below.
+
+## Add your vehicle in Apple Maps
+
+With CarPlay connected after re-pairing, complete these steps in Apple Maps **on your iPhone**:
+
+1. Open Apple Maps and tap your **profile picture** beside the search bar, highlighted below.
+
+   <img src="../images/apple-maps-profile-button.jpg" alt="Apple Maps search bar with the profile picture circled" width="320">
+
+2. Tap **Vehicles** in the profile menu.
+
+   <img src="../images/apple-maps-vehicles-menu.jpg" alt="Apple Maps profile menu with Vehicles highlighted" width="320">
+
+3. Follow the prompts to add the detected vehicle. If it is already listed, select it. When planning driving directions, choose your vehicle to use EV routing. The example below shows Hyundai Ioniq 5 selected, with charging stops and estimated battery levels.
+
+   <img src="../images/apple-maps-ev-route-preview.png" alt="Apple Maps EV driving directions with Hyundai Ioniq 5 selected, two charging stops and battery estimates" width="320">
+
+If your vehicle does not appear, confirm CarPlay is connected and that you completed the required deletion and re-pairing above.
 
 ## Update, disable and remove
 

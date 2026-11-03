@@ -9,7 +9,15 @@ Experimental Apple Maps EV routing for Gen5W, installed as a **native HMG-API mo
 3. Download **[egmp-carplay-ev-routing-v0.4.0.zip](https://github.com/isaacwisdom/egmp-carplay-ev-routing/releases/download/v0.4.0/egmp-carplay-ev-routing-v0.4.0.zip)** and copy it unchanged into `HMGAPI/updates/` on a USB stick. In HMG-API, use **Check USB updates**, install it, enable it and **Apply changes**. Remove the USB and fully reboot.
 4. **Manually delete the existing iPhone–HU pairing and pair again.** Remove the iPhone from the HU’s paired-device list, forget the HU in the iPhone’s Bluetooth and CarPlay settings, then pair again and allow CarPlay. This step is required after installation; reconnecting the existing pairing is not enough.
 
+5. On your iPhone, open Apple Maps, tap your profile picture, then **Vehicles**. Follow the prompts to add your detected vehicle, or select it if it is already listed. See the [illustrated setup steps](docs/INSTALLATION.md#add-your-vehicle-in-apple-maps).
+
 There is **one mod download** for both supported vehicles. HMG-API selects the correct bundled profile when applying the mod and writes one active profile file; the routing code always reads that file. No manual profile choice is needed. [Detailed directions](docs/INSTALLATION.md). NEMESIS wrappers are retained under `dist/testing/` for optional testing, not as primary release downloads.
+
+## Apple Maps EV routing
+
+After adding your vehicle, select it when planning driving directions. Maps can include charging stops and estimated battery levels along the route.
+
+<img src="images/apple-maps-ev-route-preview.png" alt="Apple Maps EV route preview showing Hyundai Ioniq 5, charging stops and estimated battery levels" width="280">
 
 ## Supported configurations
 

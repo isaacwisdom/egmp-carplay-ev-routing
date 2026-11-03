@@ -85,7 +85,7 @@ def main():
  # Explicit source roots; no tools, keys, host binaries, previous builds or captures.
  with tempfile.TemporaryDirectory() as t:
   source=Path(t)/name;source.mkdir()
-  for rel in ['README.md','CHANGELOG.md','LICENSE','NOTICE.md','.gitignore','release.json','mod.json','patches.json','src','stubs','recipes','svc','vehicles','packaging','tools','tests','docs']:
+  for rel in ['README.md','CHANGELOG.md','LICENSE','NOTICE.md','.gitignore','release.json','mod.json','patches.json','src','stubs','recipes','svc','vehicles','packaging','tools','tests','docs','images']:
    src=R/rel
    if src.is_dir():shutil.copytree(src,source/rel,ignore=shutil.ignore_patterns('.DS_Store','._*','__pycache__','*.pyc'))
    else:shutil.copyfile(src,source/rel)
