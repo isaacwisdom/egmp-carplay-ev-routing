@@ -1,0 +1,21 @@
+# Validation and limits
+
+On the target Ioniq 5, the HMG-API port loads, registers the stock status listener, and produces repeated successful live native sends. SOC/range are read through HSCAN; auxiliary power uses read-only HEV transactions. Energy/full-range are derived from the configured battery capacity. EV6 integration/model accuracy are unverified.
+
+Offline checks cover Java producer fixtures/lifecycle, native ARM serialization, exact-byte recipe refusal, HMG-API hook plans/signatures, NEMESIS metadata/dependencies, and mocked wrapper install/update/remove/recovery. Build evidence is generated under `out/`; On 2026-11-03, the user confirmed installation, Apply, reboot, working CarPlay and EV data with the final single-ZIP package and its fixed active-profile path. The optional NEMESIS wrapper still needs its own HU test.
+
+Known unresolved behavior: Apple Maps may recalculate at each five-second status update. We send both contracts each cycle, changing auxiliary power when live readings change. The actual modern A100 request and Apple's expected update/contract policy are not yet established. Reconnect/long-drive reliability and energy-model calibration need further testing.
+
+## Making-mods guide review
+
+Checked against the upstream [Making mods guide](https://github.com/VysseCodes/HMG-API/wiki/Making-mods) for beta6:
+
+| Check | Result |
+|---|---|
+| Declared hooks, native recipe, helper file, service and wireless dependency | Checked against beta6’s reference and shared hook planner. |
+| Packaging and author continuity | The multi-vehicle payload verifies with the established key; its archive format follows upstream `mkmodpkg.sh`. Our builder publishes that native ZIP format directly; equivalent payloads are also placed in optional NEMESIS test wrappers. |
+| HU commands | Upstream `tools/check-scripts.sh` passes the payload and every NEMESIS script. |
+| Actual package engine | The same ZIP installs, updates and removes on both simulated cars in beta6’s host engine; Apply selects the correct profile and removal clears it; wrong author, altered signed content and unsupported firmware are refused. |
+| Recovery and removal | 29 package/lifecycle checks pass; OEM files remain unchanged in the isolated tests. Reboot is required to discard in-process native changes. |
+
+Author-list registration is optional and has not been requested. First installs may show an unfamiliar-author warning. No upstream issue or package submission was made by this review. The user’s final-package HU confirmation does not establish EV6 compatibility, long-drive reliability or resolve the Maps update-cadence issue above.
