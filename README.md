@@ -11,7 +11,7 @@ Experimental Apple Maps EV routing for Gen5W, installed as a **native HMG-API mo
 
 5. On your iPhone, open Apple Maps, tap your profile picture, then **Vehicles**. Follow the prompts to add your detected vehicle, or select it if it is already listed. See the [illustrated setup steps](docs/INSTALLATION.md#add-your-vehicle-in-apple-maps).
 
-There is **one mod download** for both supported vehicles. HMG-API selects the correct bundled profile when applying the mod and writes one active profile file; the routing code always reads that file. No manual profile choice is needed. [Detailed directions](docs/INSTALLATION.md). Official NEMESIS store packages are [prepared for rollout](docs/NEMESIS-RELEASE.md); they have not been submitted. The current installation route above remains available.
+There is **one mod download** for both supported vehicles. HMG-API selects the correct bundled profile when applying the mod and writes one active profile file; the routing code always reads that file. No manual profile choice is needed. [Detailed directions](docs/INSTALLATION.md). The [NEMESIS store rollout is on hold](docs/NEMESIS-RELEASE.md) pending investigation and HU verification of upstream HMG-API v1.0.0 issues. Our tested HU baseline is beta.6; v1.0.0 has only been checked off the car. The existing native mod installation route remains available.
 
 ## Apple Maps EV routing
 

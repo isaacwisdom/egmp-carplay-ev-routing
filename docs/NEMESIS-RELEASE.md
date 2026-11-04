@@ -1,4 +1,6 @@
-# NEMESIS store rollout — prepared, not submitted
+# NEMESIS store rollout — on hold
+
+**Rollout is on hold.** Upstream HMG-API v1.0.0 operational issues need investigation and HU verification before proceeding. Its appearance in the store alone does not release this hold. Our off-car checks establish package compatibility, not reliability of the core update.
 
 The existing signed **0.4.0** native mod stays the payload. The store package uses HMG-API v1’s official lifecycle scripts; this is packaging for the same mod, not a second EV implementation.
 
@@ -27,7 +29,7 @@ python3 tools/prepare-nemesis.py \
 
 This verifies the published ZIP’s SHA256, signature, author UUID, ID and version, runs upstream `tools/mknemesismod.sh`, and generates the wrapper/download/checksums. It never needs the author’s private key. Published native ZIPs must not be replaced. Preparation is pinned in `packaging/nemesis-release.json` to the reviewed upstream version and existing tested payload.
 
-## Once the dependencies are in the store
+## After the hold is lifted and dependencies are in the store
 
 1. Confirm the store offers `hmgapi` **1.0+** and `hmgapi.wireless-carplay-aa` **2.1.0+** under those exact IDs. Verify compatibility for our listed cars. Store packaging support by itself does not establish that the listings are live.
 2. Test the prepared wrapper through NEMESIS on the HU. Native v0.4.0 is already HU-tested; the official wrapper has only been tested off the car so far.
