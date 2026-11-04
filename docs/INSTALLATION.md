@@ -64,8 +64,8 @@ Import the newer signed ZIP in HMG-API and apply. Existing signed local HMG test
 
 Remove in HMG-API, then apply changes and reboot; the wireless mod stays installed. Temporarily disabling also needs apply and a full reboot, because the native recipe is applied in process memory. Re-enabling requires a reboot to register the status listener again. Runtime native-hash and required-point checks keep unknown layouts inactive.
 
-## Optional NEMESIS wrapper
+## NEMESIS store rollout
 
-`dist/testing/` retains `egmp-carplay-ev-routing-v0.4.0-nemesis-package.zip` and `-nemesis-usb.zip` for wrapper testing. That wrapper owns the inner mod’s installation/removal; do not mix management routes. If already installed as NEMESIS package `carplay.ev-routing`, uninstall that wrapper through NEMESIS, reboot, then install the native mod above. A direct HMG-API test mod without the wrapper can be updated in place.
+Official HMG-API v1 NEMESIS packages are [prepared for a future store rollout](NEMESIS-RELEASE.md). They are not listed yet; use the native installation route above for now. The official package ID is `hmgapi.egmp-carplay-ev-routing`, and HMG-API v1 synchronizes it with its native mod listing.
 
-Interrupted wrapper recovery remains available as `sh /data/nemesis/apps/carplay.ev-routing/scripts/recover.sh` through a privileged HMG-API shell. Keep its backup until recovered. NEMESIS intentionally leaves `/system` writable on this HU; that alone is not a failure.
+If you used our older experimental NEMESIS wrapper `carplay.ev-routing`, uninstall that package through NEMESIS and reboot before using the official package. A native HMG-API installation can be updated/adopted by the official package using the same mod ID and signing key. The old wrapper’s recovery script, if needed, remains on that HU at `/data/nemesis/apps/carplay.ev-routing/scripts/recover.sh`; keep its backup until recovered.

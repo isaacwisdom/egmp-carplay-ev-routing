@@ -7,3 +7,5 @@
 - OpenJDK, Clang/LLD, R8/D8, Android API classes, JSON-java and pyelftools: external build/test tools, not bundled in release packages.
 
 Original project code is GPL-3.0-or-later. Dependency copyrights/licenses remain applicable; see LICENSE. Manufacturer applications, libraries and firmware are private runtime/test inputs, never distributed here. No signing private keys or raw HU captures are included.
+
+Official NEMESIS wrappers include unmodified HMG-API lifecycle scripts under AGPL-3.0, with the upstream license and a source link. The embedded EV-routing mod retains its own license and signing identity.

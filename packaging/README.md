@@ -1,9 +1,7 @@
-# Optional NEMESIS testing package
+# NEMESIS packaging
 
-`nemesis/` contains the 1.1 descriptor, lifecycle scripts and a Launch action opening HMG-API. `depends=hmgapi@>=0.99.6` requires the official HMG-API beta6 NEMESIS package or newer. The preinstall hook also verifies the running daemon version and refuses beta5/custom cores.
+`nemesis-release.json` configures the official HMG-API v1 wrapper preparation: the pinned published native ZIP, dependencies and legacy-wrapper conflict. Run `tools/prepare-nemesis.py` against the reviewed HMG-API v1.0.0 source. The generated store and USB packages are under `dist/nemesis/`.
 
-The builder adds the same signed multi-vehicle HMG-API mod ZIP and a compatibility table. HMG-API selects the active profile at Apply. NEMESIS installs our wrapper; it delegates mod import, apply, restore and removal to HMG-API. The wrapper never rebuilds/replaces an OEM APK, ODEX or library on disk. HMG-API owns our helper library and in-memory OEM recipes.
+All lifecycle scripts come from upstream unchanged and use `--from-nemesis` to avoid nested package-list synchronization. Only dependency metadata is extended to require wireless projection and refuse the old wrapper. No extra install/rollback service is added.
 
-Updates retain the existing mod for replacement. Failed import/apply restores the previous signed mod/state; interrupted operations leave an explicit recovery transaction. Uninstall requires resolving incomplete transactions first. The USB archive's generated root descriptor installs the same NEMESIS package under packages/.
-
-The primary release is now the single signed native HMG-API ZIP. These wrappers are generated only under `dist/testing/`; do not upload them as the primary release or mix wrapper/native management on one HU.
+`nemesis/` contains the earlier beta6 experimental wrapper, retained for its existing tests/recovery reference. It is obsolete for the v1 rollout and must not be uploaded. Use the [rollout plan](../docs/NEMESIS-RELEASE.md).
