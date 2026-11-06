@@ -19,6 +19,13 @@
       "src": "profiles/cvev.json",
       "mode": "644",
       "part": "cvev"
+    },
+    {
+      "type": "add",
+      "path": "/system/etc/carplay.ev-routing/profile.json",
+      "src": "profiles/neev.json",
+      "mode": "644",
+      "part": "neev"
     }
   ]
 }

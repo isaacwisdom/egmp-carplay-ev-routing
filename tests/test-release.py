@@ -152,7 +152,7 @@ class Package(unittest.TestCase):
   self.assertEqual(native.read_bytes(),(STAGE/'payload/mod.zip').read_bytes())
   with zipfile.ZipFile(native) as z:
    self.assertIn('mod.json',z.namelist());self.assertIn('META-HMGAPI/signature',z.namelist());self.assertNotIn('NEMESIS.data',z.namelist())
-   meta=json.loads(z.read('mod.json'));self.assertEqual([s['model'][0] for s in meta['system']],['NEEV23','CVEV'])
+   meta=json.loads(z.read('mod.json'));self.assertEqual([s['model'][0] for s in meta['system']],[e['model'] for e in CONFIG['profiles']])
    for entry in CONFIG['profiles']:self.assertIn('profiles/'+entry['model'].lower()+'.json',z.namelist())
   for entry in CONFIG['profiles']:self.assertFalse((R/'dist'/(stem+'-'+entry['model'].lower()+'-usa-'+entry['firmware']+'.zip')).exists())
  def test_usb_and_source_allowlist(self):

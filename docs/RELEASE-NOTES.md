@@ -1,3 +1,13 @@
+# v0.4.1 — Experimental
+
+- Add the 2022 US Ioniq 5 with a 77.4 kWh battery and firmware `NEEV.USA.S5W_M.V015.012.260507` to the accepted vehicle list. It uses the existing Ioniq 5 profile; on-car validation is pending.
+- Log both detected native-library MD5 hashes when an unsupported hash keeps EV routing inactive. Unreadable hashes are reported as `unavailable`.
+- Keep the existing exact-hash checks and required HMG-API hook checks. No native patch, energy model or update-frequency changes.
+
+Install the single signed mod ZIP through HMG-API, apply changes and fully reboot. For a first installation, manually delete the iPhone–HU pairing on both devices and pair again. See [installation instructions](https://github.com/isaacwisdom/egmp-carplay-ev-routing/blob/main/docs/INSTALLATION.md).
+
+The five-second route recalculation issue remains under investigation. EV6 values remain copied and unvalidated. NEMESIS store rollout remains on hold.
+
 # v0.4.0 — Experimental
 
 First public release of E-GMP CarPlay EV Routing for Gen5W, using official HMG-API **1.0.0-beta.6 or newer** and its Wireless CarPlay + Android Auto mod.

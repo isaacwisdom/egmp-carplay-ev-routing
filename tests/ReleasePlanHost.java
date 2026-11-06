@@ -6,7 +6,7 @@ public final class ReleasePlanHost {
  static Map<String,Object> read(Path p)throws Exception{return Json.object(new String(Files.readAllBytes(p),"UTF-8"));}
  @SuppressWarnings("unchecked") public static void main(String[] args)throws Exception {
   Path up=Paths.get(args[0]),out=Paths.get(args[1]);
-  for(String[] car:new String[][]{{"NEEV23","hyundai/neev/usa/260507"},{"CVEV","kia/ev6/usa/260507"}}){
+  for(String[] car:new String[][]{{"NEEV","hyundai/neev/usa/260507"},{"NEEV23","hyundai/neev/usa/260507"},{"CVEV","kia/ev6/usa/260507"}}){
    Path map=up.resolve("maps/"+car[1]);Map<String,Object> meta=read(map.resolve("car.json"));Map<String,Object> points=new LinkedHashMap<String,Object>();
    for(Object app:(List<Object>)meta.get("apps"))points.putAll(read(map.resolve(app+".json")));
    Map<String,Map<String,Object>> mods=new LinkedHashMap<String,Map<String,Object>>();mods.put("wireless-carplay-aa",read(up.resolve("mods/wireless-carplay-aa/mod.json")));mods.put("egmp-carplay-ev-routing",read(out.resolve("mod/mod.json")));

@@ -1,7 +1,7 @@
 {
   "id": "egmp-carplay-ev-routing",
   "name": "E-GMP CarPlay EV Routing",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "hmgapi": ">=1.0.0-beta.6 <2.0.0",
   "authors": [
     "E-GMP CarPlay EV Routing contributors"
@@ -19,6 +19,13 @@
     {
       "model": [
         "CVEV"
+      ],
+      "region": "USA",
+      "firmware": "260507"
+    },
+    {
+      "model": [
+        "NEEV"
       ],
       "region": "USA",
       "firmware": "260507"
@@ -73,6 +80,16 @@
       "system": {
         "model": [
           "CVEV"
+        ],
+        "region": "USA",
+        "firmware": "260507"
+      }
+    },
+    {
+      "id": "neev",
+      "system": {
+        "model": [
+          "NEEV"
         ],
         "region": "USA",
         "firmware": "260507"

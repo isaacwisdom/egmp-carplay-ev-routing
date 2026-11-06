@@ -1,3 +1,9 @@
+# 0.4.1 — experimental
+
+- Accept the 2022 US Ioniq 5 (`NEEV.USA`, firmware `260507`) with the existing 77.4 kWh profile; on-car validation pending.
+- Include both detected native-library MD5 hashes in rejection logs; exact-hash guards remain unchanged.
+- Native patch, energy models and five-second update policy are unchanged.
+
 # 0.4.0 — experimental first release
 
 - One signed native HMG-API mod download with automatic profile selection at Apply, requiring official beta6 or newer.
