@@ -62,7 +62,7 @@ public final class AppProvider {
                             mod.log("CarPlayEV native_send="+rc+" soc_e3="+snapshot.values[3]+" range_km="+snapshot.values[4]+" current_wh="+snapshot.values[2]+" min_wh="+snapshot.values[0]+" max_wh="+snapshot.values[1]+" full_range_km="+(snapshot.values[8]==1?String.valueOf(snapshot.values[6]):"omitted")+" auxiliary_w="+snapshot.auxiliaryW+" auxiliary_source="+snapshot.auxiliarySource+" warning="+snapshot.values[5]+" live="+snapshot.values[7]+" charging_model=12582922 consumption_model=12582921");
                         }
                     } catch(Throwable error){mod.error("CarPlayEV send (will retry while subscribed)",error);}
-                    Thread.sleep(5000);
+                    Thread.sleep(10000);
                 }
             } catch(InterruptedException ended){Thread.currentThread().interrupt();}
         }},"CarPlayEV");worker.setDaemon(true);worker.start();

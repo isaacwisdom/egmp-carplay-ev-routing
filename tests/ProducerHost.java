@@ -21,18 +21,23 @@ public final class ProducerHost {
         check(VehicleSource.displayedSoc(74)==74 && VehicleSource.displayedSoc(74.5)==74,"floor display SOC");
         check(VehicleSource.displayedSoc(99.5)==99 && VehicleSource.displayedSoc(100)==100,"floor upper half-step");
         for(double bad:new double[]{-0.5,100.5,Double.NaN,Double.POSITIVE_INFINITY})try{VehicleSource.displayedSoc(bad);throw new AssertionError("accepted invalid SOC");}catch(IllegalArgumentException expected){}
+        VehicleSource.AuxiliaryAverage avg=new VehicleSource.AuxiliaryAverage(400);
+        for(int i=0;i<6;i++)check(avg.update(Integer.valueOf(300+i*10),i*10000000000L)==400,"hold auxiliary during first minute");
+        check(avg.update(Integer.valueOf(1000),60000000000L)==325 && avg.hasAverage(),"publish rounded one-minute average");
+        check(avg.update(null,70000000000L)==325,"hold published auxiliary on missing sample");
+        check(avg.update(Integer.valueOf(1049),120000000000L)==1000,"publish available samples only");
         String profile=new String(Files.readAllBytes(Paths.get(args[1])),"UTF-8");
         new VehicleSource(null,profile);
         JSONObject p=new JSONObject(profile);
         String ch=p.getJSONObject("charging_contract").toString(),co=p.getJSONObject("consumption_contract").toString();
         VehicleSource.Snapshot held=VehicleSource.encode(0,77400,ch,co,Double.valueOf(50),Integer.valueOf(206),Integer.valueOf(310),false);
-        check(held.auxiliarySource.equals("last_known") && held.auxiliaryW==310,"held auxiliary");
+        check(held.auxiliarySource.equals("profile_default") && held.auxiliaryW==310,"profile auxiliary before first average");
         check(VehicleSource.fresh(1,15000000001L) && !VehicleSource.fresh(1,15000000002L) && !VehicleSource.fresh(2,1),"sample freshness");
         Subscription gate=new Subscription();gate.connected(3);long a=gate.start();check(gate.current(a),"start");
         check(gate.start()==a,"duplicate start idempotent");check(!gate.disconnected(4) && gate.current(a),"unrelated component");
         gate.stop();check(!gate.current(a),"stop invalidates worker");long b=gate.start();check(b!=a && gate.current(b),"rapid resubscribe");
         gate.connected(5);check(!gate.current(b),"new transport invalidates old worker");long c=gate.start();check(gate.disconnected(5) && !gate.current(c),"matching disconnect");
         gate.close();check(gate.start()==0,"closed provider cannot restart");
-        System.out.println("PASS nine producer reference fixtures, Hyundai SOC flooring, auxiliary scaling/retention, and semantic subscription lifecycle");
+        System.out.println("PASS nine producer reference fixtures, Hyundai SOC flooring, one-minute auxiliary averaging, and semantic subscription lifecycle");
     }
 }

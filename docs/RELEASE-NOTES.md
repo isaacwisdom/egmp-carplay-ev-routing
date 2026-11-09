@@ -1,3 +1,11 @@
+# v0.4.3 — Experimental
+
+- Send vehicle status to Apple Maps every ten seconds instead of every five seconds.
+- Sample auxiliary power with each status, average valid readings over one-minute windows, round each published average to the nearest 25 W and keep that value unchanged until the next minute boundary. The profile default remains in use until the first window completes; missing readings do not become zero.
+- Add deterministic host tests for the first-minute hold, minute-boundary publication, 25 W rounding and missing-sample retention.
+
+This is an experimental mitigation for repeated route recalculation. Apple's required status cadence and contract-update semantics remain undocumented, so on-car validation is still required.
+
 # v0.4.2 — Experimental
 
 - Floor live battery state of charge to a whole percent before sending it to Apple Maps. Hyundai's EV app converts its half-percent `DISPLAY_SOC` signal to an integer by truncation; this keeps Maps from showing one percentage point more than the car when the underlying value ends in `.5`.

@@ -5,6 +5,8 @@ import java.lang.reflect.*;
 import org.json.*;
 /** Read-only HSCAN/HEV adapter. No network, automatic profile updates or fake readings. */
 public final class VehicleSource {
+    static final long AUXILIARY_WINDOW_NS=60000000000L;
+    static final int AUXILIARY_ROUND_W=25;
     public static final class Snapshot {
         public final int[] values;
         public final byte[] charging,consumption;
@@ -18,7 +20,25 @@ public final class VehicleSource {
     public final String displayName;
     public final int dcW,acW;
     private Object adapter,binder;
-    private Integer lastAuxiliary;
+    private final AuxiliaryAverage auxiliaryAverage;
+    static final class AuxiliaryAverage {
+        private int published;
+        private long started=-1,sum;
+        private int count;
+        private boolean averaged;
+        AuxiliaryAverage(int initial){published=initial;}
+        int update(Integer sample,long now){
+            if(started<0)started=now;
+            else if(now<started){started=now;sum=0;count=0;}
+            if(now-started>=AUXILIARY_WINDOW_NS){
+                if(count>0){published=(int)(Math.round(((double)sum/count)/AUXILIARY_ROUND_W)*AUXILIARY_ROUND_W);averaged=true;}
+                started=now;sum=0;count=0;
+            }
+            if(sample!=null){int value=sample.intValue();if(value<0 || value>30000)throw new IllegalArgumentException("auxiliary sample");sum+=value;count++;}
+            return published;
+        }
+        boolean hasAverage(){return averaged;}
+    }
     public VehicleSource(Object service,String source) throws Exception {
         this.service=service;JSONObject p=new JSONObject(source);
         if(p.getInt("schema_version")!=1)throw new IllegalArgumentException("profile schema");
@@ -40,6 +60,7 @@ public final class VehicleSource {
         bounded(charging);bounded(consumption);
         double aux=co.getJSONObject("vehicle_parameters").getDouble("vehicle_auxiliary_power_w");
         if(Double.isNaN(aux) || Double.isInfinite(aux) || aux<0 || aux>30000)throw new IllegalArgumentException("auxiliary default");
+        auxiliaryAverage=new AuxiliaryAverage((int)Math.round(aux));
     }
     public static String readFile(String path) throws Exception {
         InputStream in=new FileInputStream(path);
@@ -73,7 +94,7 @@ public final class VehicleSource {
         return (int)Math.floor(percent);
     }
     public synchronized Snapshot poll() throws Exception {
-        Double soc=null;Integer range=null;boolean liveAux=false;long sampledNs=0;
+        Double soc=null;Integer range=null,auxiliarySample=null;long sampledNs=0;
         try {
             if(adapter==null){
                 ClassLoader parent=(ClassLoader)service.getClass().getMethod("getClassLoader").invoke(service);
@@ -90,10 +111,11 @@ public final class VehicleSource {
         } catch(Exception failure){adapter=null;}
         try {
             if(hev(27,null)!=2)throw new IOException("CAN generation");
-            lastAuxiliary=Integer.valueOf(auxiliary(hev(3,0x4f),hev(3,0x24),hev(3,0x33),hev(3,0x43)));liveAux=true;
+            auxiliarySample=Integer.valueOf(auxiliary(hev(3,0x4f),hev(3,0x24),hev(3,0x33),hev(3,0x43)));
         } catch(Exception failure){binder=null;}
-        if(!fresh(sampledNs,System.nanoTime())){soc=null;range=null;}
-        return encode(minWh,maxWh,charging,consumption,soc,range,lastAuxiliary,liveAux);
+        long now=System.nanoTime();if(!fresh(sampledNs,now)){soc=null;range=null;}
+        int publishedAuxiliary=auxiliaryAverage.update(auxiliarySample,now);
+        return encode(minWh,maxWh,charging,consumption,soc,range,Integer.valueOf(publishedAuxiliary),auxiliaryAverage.hasAverage());
     }
     static boolean fresh(long sampled,long now){long age=now-sampled;return sampled!=0 && age>=0 && age<=15000000000L;}
     static Snapshot encode(int min,int max,String ch,String co,Double percent,Integer range,Integer aux,boolean liveAux) throws Exception {
@@ -106,6 +128,6 @@ public final class VehicleSource {
         }
         JSONObject consumption=new JSONObject(co);
         if(aux!=null){if(aux.intValue()<0 || aux.intValue()>30000)throw new IllegalArgumentException("auxiliary watts");consumption.getJSONObject("vehicle_parameters").put("vehicle_auxiliary_power_w",aux.doubleValue());}
-        return new Snapshot(values,bounded(ch),bounded(consumption.toString()),aux==null?"profile_default":liveAux?"live":"last_known",consumption.getJSONObject("vehicle_parameters").getDouble("vehicle_auxiliary_power_w"));
+        return new Snapshot(values,bounded(ch),bounded(consumption.toString()),aux==null?"profile_default":liveAux?"one_minute_average":"profile_default",consumption.getJSONObject("vehicle_parameters").getDouble("vehicle_auxiliary_power_w"));
     }
 }

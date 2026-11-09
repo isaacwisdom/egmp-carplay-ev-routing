@@ -4,7 +4,7 @@ On the target Ioniq 5, the HMG-API port loads, registers the stock status listen
 
 Offline checks cover Java producer fixtures/lifecycle, native ARM serialization, exact-byte recipe refusal, HMG-API hook plans/signatures, NEMESIS metadata/dependencies, and mocked wrapper install/update/remove/recovery. Build evidence is generated under `out/`; On 2026-11-03, the user confirmed installation, Apply, reboot, working CarPlay and EV data with the final single-ZIP package and its fixed active-profile path. The optional NEMESIS wrapper still needs its own HU test.
 
-Known unresolved behavior: Apple Maps may recalculate at each five-second status update. We send both contracts each cycle, changing auxiliary power when live readings change. The actual modern A100 request and Apple's expected update/contract policy are not yet established. Reconnect/long-drive reliability and energy-model calibration need further testing.
+Version 0.4.3 experimentally mitigates repeated route recalculation by sending status every ten seconds and changing the one-minute, 25 W-rounded auxiliary average only at minute boundaries. We still send both contracts each cycle. Apple's expected update/contract policy is not established, so this behavior requires on-car validation. Reconnect/long-drive reliability and energy-model calibration need further testing.
 
 ## Making-mods guide review
 

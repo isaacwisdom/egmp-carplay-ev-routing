@@ -1,3 +1,9 @@
+# 0.4.3 — experimental
+
+- Send vehicle status every ten seconds instead of every five seconds.
+- Average valid auxiliary-power samples over one-minute windows, round the result to the nearest 25 W and publish it only at minute boundaries. Hold the profile default until the first complete window and retain the last published average through missing samples.
+- Add deterministic regression coverage for window timing, rounding and missing samples.
+
 # 0.4.2 — experimental
 
 - Floor live battery state of charge to a whole percent before sending it to Apple Maps, matching Hyundai's EV app treatment of the half-percent `DISPLAY_SOC` signal.
