@@ -17,6 +17,10 @@ public final class ProducerHost {
         check(VehicleSource.auxiliary(0,31,0,0)==310,"observed auxiliary");
         check(VehicleSource.auxiliary(26,24,10,20)==2960,"mixed auxiliary");
         check(VehicleSource.auxiliary(0,0,0,0)==0,"zero auxiliary");
+        check(VehicleSource.displayedSoc(0)==0 && VehicleSource.displayedSoc(0.5)==0,"floor zero half-step");
+        check(VehicleSource.displayedSoc(74)==74 && VehicleSource.displayedSoc(74.5)==74,"floor display SOC");
+        check(VehicleSource.displayedSoc(99.5)==99 && VehicleSource.displayedSoc(100)==100,"floor upper half-step");
+        for(double bad:new double[]{-0.5,100.5,Double.NaN,Double.POSITIVE_INFINITY})try{VehicleSource.displayedSoc(bad);throw new AssertionError("accepted invalid SOC");}catch(IllegalArgumentException expected){}
         String profile=new String(Files.readAllBytes(Paths.get(args[1])),"UTF-8");
         new VehicleSource(null,profile);
         JSONObject p=new JSONObject(profile);
@@ -29,6 +33,6 @@ public final class ProducerHost {
         gate.stop();check(!gate.current(a),"stop invalidates worker");long b=gate.start();check(b!=a && gate.current(b),"rapid resubscribe");
         gate.connected(5);check(!gate.current(b),"new transport invalidates old worker");long c=gate.start();check(gate.disconnected(5) && !gate.current(c),"matching disconnect");
         gate.close();check(gate.start()==0,"closed provider cannot restart");
-        System.out.println("PASS nine producer reference fixtures, auxiliary scaling/retention, and semantic subscription lifecycle");
+        System.out.println("PASS nine producer reference fixtures, Hyundai SOC flooring, auxiliary scaling/retention, and semantic subscription lifecycle");
     }
 }

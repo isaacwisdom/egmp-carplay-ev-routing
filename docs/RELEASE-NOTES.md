@@ -1,3 +1,11 @@
+# v0.4.2 — Experimental
+
+- Floor live battery state of charge to a whole percent before sending it to Apple Maps. Hyundai's EV app converts its half-percent `DISPLAY_SOC` signal to an integer by truncation; this keeps Maps from showing one percentage point more than the car when the underlying value ends in `.5`.
+- Add host regression tests for zero, middle and upper half-percent values and invalid SOC inputs.
+- Keep the existing native patch, vehicle profiles, energy models, auxiliary-power behavior and five-second update policy unchanged.
+
+Install the single signed mod ZIP through HMG-API, apply changes, fully reboot and re-pair the iPhone if this is the first installation. The five-second route-recalculation issue, capacity semantics and EV6 calibration remain under investigation.
+
 # v0.4.1 — Experimental
 
 - Add the 2022 US Ioniq 5 with a 77.4 kWh battery and firmware `NEEV.USA.S5W_M.V015.012.260507` to the accepted vehicle list. It uses the existing Ioniq 5 profile; on-car validation is pending.

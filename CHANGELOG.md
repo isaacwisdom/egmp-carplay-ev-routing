@@ -1,3 +1,9 @@
+# 0.4.2 — experimental
+
+- Floor live battery state of charge to a whole percent before sending it to Apple Maps, matching Hyundai's EV app treatment of the half-percent `DISPLAY_SOC` signal.
+- Add regression coverage for half-percent SOC values and invalid inputs.
+- Native patch, energy models, auxiliary-power behavior and five-second update policy are unchanged.
+
 # 0.4.1 — experimental
 
 - Accept the 2022 US Ioniq 5 (`NEEV.USA`, firmware `260507`) with the existing 77.4 kWh profile; on-car validation pending.

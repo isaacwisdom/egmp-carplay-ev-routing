@@ -1,12 +1,12 @@
 # E-GMP CarPlay EV Routing
 
-Experimental Apple Maps EV routing for Gen5W, installed as a **native HMG-API mod**, using **official HMG-API 1.0.0-beta.6 or newer**. Current version: **0.4.1** (experimental).
+Experimental Apple Maps EV routing for Gen5W, installed as a **native HMG-API mod**, using **official HMG-API 1.0.0-beta.6 or newer**. Current version: **0.4.2** (experimental).
 
 ## Install
 
 1. Install [NEMESIS](https://github.com/xwtk/hmg_nemesis) and [HMG-API beta6 or newer](https://github.com/VysseCodes/HMG-API/releases). NEMESIS can install HMG-API itself.
 2. Install/enable HMG-API’s **Wireless CarPlay + Android Auto** mod, apply, verify the car map and reboot. It is a separate download; confirm CarPlay works.
-3. Download **[egmp-carplay-ev-routing-v0.4.1.zip](https://github.com/isaacwisdom/egmp-carplay-ev-routing/releases/download/v0.4.1/egmp-carplay-ev-routing-v0.4.1.zip)** and copy it unchanged into `HMGAPI/updates/` on a USB stick. In HMG-API, use **Check USB updates**, install it, enable it and **Apply changes**. Remove the USB and fully reboot.
+3. Download **[egmp-carplay-ev-routing-v0.4.2.zip](https://github.com/isaacwisdom/egmp-carplay-ev-routing/releases/download/v0.4.2/egmp-carplay-ev-routing-v0.4.2.zip)** and copy it unchanged into `HMGAPI/updates/` on a USB stick. In HMG-API, use **Check USB updates**, install it, enable it and **Apply changes**. Remove the USB and fully reboot.
 4. **Manually delete the existing iPhone–HU pairing and pair again.** Remove the iPhone from the HU’s paired-device list, forget the HU in the iPhone’s Bluetooth and CarPlay settings, then pair again and allow CarPlay. This step is required after installation; reconnecting the existing pairing is not enough.
 
 5. On your iPhone, open Apple Maps, tap your profile picture, then **Vehicles**. Follow the prompts to add your detected vehicle, or select it if it is already listed. See the [illustrated setup steps](docs/INSTALLATION.md#add-your-vehicle-in-apple-maps).

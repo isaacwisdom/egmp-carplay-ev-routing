@@ -67,6 +67,11 @@ public final class VehicleSource {
         if(c<0 || c>=65535 || e<0 || e>=255 || b<0 || b>=255 || h<0 || h>=255)throw new IllegalArgumentException("auxiliary raw");
         int w=c*20+e*10+b*20+h*100;if(w>30000)throw new IllegalArgumentException("auxiliary watts");return w;
     }
+    /** Match Hyundai's EV app: DISPLAY_SOC is shown as a floored whole percent. */
+    static int displayedSoc(double percent){
+        if(Double.isNaN(percent) || Double.isInfinite(percent) || percent<0 || percent>100)throw new IllegalArgumentException("SOC bounds");
+        return (int)Math.floor(percent);
+    }
     public synchronized Snapshot poll() throws Exception {
         Double soc=null;Integer range=null;boolean liveAux=false;long sampledNs=0;
         try {
@@ -80,8 +85,8 @@ public final class VehicleSource {
             Object r=adapter.getClass().getMethod("ableDriveDistance",byte.class).invoke(adapter,Byte.valueOf((byte)0));
             if(!(s instanceof Number) || !(r instanceof Integer))throw new IOException("HSCAN types");
             double pct=((Number)s).doubleValue();int km=((Integer)r).intValue();
-            if(Double.isNaN(pct) || Double.isInfinite(pct) || pct<0 || pct>100 || km<0 || km>=2000)throw new IOException("HSCAN bounds");
-            soc=Double.valueOf(pct);range=Integer.valueOf(km);sampledNs=System.nanoTime();
+            if(km<0 || km>=2000)throw new IOException("HSCAN bounds");
+            soc=Double.valueOf(displayedSoc(pct));range=Integer.valueOf(km);sampledNs=System.nanoTime();
         } catch(Exception failure){adapter=null;}
         try {
             if(hev(27,null)!=2)throw new IOException("CAN generation");
