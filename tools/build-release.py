@@ -20,7 +20,7 @@ def classjar(folder,path):
   for p in sorted(folder.rglob('*.class')):z.write(p,p.relative_to(folder).as_posix())
 def main():
  ap=argparse.ArgumentParser(description=__doc__)
- for arg in ('hmgapi-source','android-jar','d8-jar','json-jar','key'):ap.add_argument('--'+arg,required=True,type=Path)
+ for arg in ('hmgapi-source','wireless-source','android-jar','d8-jar','json-jar','key'):ap.add_argument('--'+arg,required=True,type=Path)
  ap.add_argument('--java-home',type=Path,default=Path(os.environ.get('JAVA_HOME','/opt/homebrew/opt/openjdk@17')))
  ap.add_argument('--clang',default=os.environ.get('CLANG','clang'));ap.add_argument('--lld',default=os.environ.get('LLD','ld.lld'))
  a=ap.parse_args();up=a.hmgapi_source.resolve();java=a.java_home/'bin';out=R/'out';dist=R/'dist';out.mkdir(exist_ok=True);dist.mkdir(exist_ok=True)
@@ -38,22 +38,21 @@ def main():
  # ARM harness artifact is not shipped; tests can execute the real JNI code offline.
  run(a.clang,*arm,'-I'+str(native/'compat'),'-I'+str(a.java_home/'include'),'-c',R/'tests/jni_imports.c','-o',out/'jni_imports.o')
  run(a.lld,'-Ttext=0x02000000','-e','bridge_bind','-o',out/'bridge_jni_test.elf',out/'bridge_jni.o',out/'jni_imports.o')
- run(a.clang,'--target=armv7-none-eabi','-mthumb','-c',native/'recipe_gate.s','-o',out/'gate.o');run(a.lld,'--image-base=0','-Ttext=0','-e','gate','-o',out/'gate.elf',out/'gate.o')
- from elftools.elf.elffile import ELFFile
- with (out/'gate.elf').open('rb') as f:gate=ELFFile(f).get_section_by_name('.text').data()
- expected=next(line.split()[2] for line in (R/'recipes/native-fc7.recipe').read_text().splitlines() if line.startswith('segment '))
- if gate.hex()!=expected:raise SystemExit('Assembly differs from reviewed recipe gate')
- hmg=out/'hmg-classes';oem=out/'oem-stubs';classes=out/'mod-classes';tests=out/'tests'
- for p in (hmg,oem,classes,tests):
+ hmg=out/'hmg-classes';wireless_api=out/'wireless-api';oem=out/'oem-stubs';classes=out/'mod-classes';tests=out/'tests'
+ for p in (hmg,wireless_api,oem,classes,tests):
   if p.exists():shutil.rmtree(p)
  compile_java(list((up/'core/runtime/java').rglob('*.java'))+list((up/'core/runtime/stubs').rglob('*.java')),hmg,[a.android_jar,a.json_jar],java)
+ api_source=a.wireless_source/'wireless-carplay-aa/src/hmgapi/mods/wireless/api'
+ api_files=list(api_source.rglob('*.java'))
+ if not api_files:raise SystemExit('No Wireless CarPlay API sources under '+str(api_source))
+ compile_java(api_files,wireless_api,[a.android_jar],java)
  compile_java(list((R/'stubs').rglob('*.java')),oem,[a.android_jar],java)
- compile_java(list((R/'src/java').rglob('*.java')),classes,[hmg,oem,a.android_jar,a.json_jar],java)
- compile_java(list((R/'tests').glob('*.java')),tests,[classes,hmg,a.android_jar,a.json_jar],java)
+ compile_java(list((R/'src/java').rglob('*.java')),classes,[hmg,wireless_api,oem,a.android_jar,a.json_jar],java)
+ compile_java(list((R/'tests').glob('*.java')),tests,[classes,hmg,wireless_api,a.android_jar,a.json_jar],java)
  run(java/'java','-cp',':'.join(map(str,[a.json_jar,classes,hmg,tests])),'org.egmp.carplay.ev.app.ProducerHost',R/'tests/fixtures/status.json',R/'vehicles/hyundai/ioniq-5/us-77kwh/profile.json')
- for folder,jar_name in [(hmg,'hmg-compile.jar'),(oem,'oem-compile.jar'),(classes,'hooks-classes.jar')]:classjar(folder,out/jar_name)
+ for folder,jar_name in [(hmg,'hmg-compile.jar'),(wireless_api,'wireless-api-compile.jar'),(oem,'oem-compile.jar'),(classes,'hooks-classes.jar')]:classjar(folder,out/jar_name)
  dex=out/'dex';dex.mkdir(exist_ok=True)
- run(java/'java','-cp',a.d8_jar,'com.android.tools.r8.D8','--min-api','18','--lib',a.android_jar,'--lib',(java/'javac').resolve().parents[1],'--classpath',out/'hmg-compile.jar','--classpath',out/'oem-compile.jar','--output',dex,out/'hooks-classes.jar')
+ run(java/'java','-cp',a.d8_jar,'com.android.tools.r8.D8','--min-api','18','--lib',a.android_jar,'--lib',(java/'javac').resolve().parents[1],'--classpath',out/'hmg-compile.jar','--classpath',out/'wireless-api-compile.jar','--classpath',out/'oem-compile.jar','--output',dex,out/'hooks-classes.jar')
  if not all(n.startswith('org/egmp/carplay/ev/') for n in zipfile.ZipFile(out/'hooks-classes.jar').namelist()):raise SystemExit('Compile-only classes leaked into mod')
  run(java/'java','-cp',hmg,'hmgapi.engine.ScriptCheck',up/'core/runtime/unit-commands.txt',R/'packaging/nemesis',R/'svc')
  stage=out/'nemesis-stage'
@@ -63,7 +62,7 @@ def main():
  if mod.exists():shutil.rmtree(mod)
  mod.mkdir();meta=json.loads((R/'mod.json').read_text());meta['version']=version
  (mod/'mod.json').write_text(json.dumps(meta,indent=2)+'\n');shutil.copyfile(R/'patches.json',mod/'patches.json');shutil.copyfile(R/'LICENSE',mod/'LICENSE');shutil.copyfile(R/'NOTICE.md',mod/'NOTICE.md')
- for path,src in [('files/libcarplayev.so',out/'libcarplayev.so'),('recipes/native-fc7.recipe',R/'recipes/native-fc7.recipe'),('svc/capture.sh',R/'svc/capture.sh')]:
+ for path,src in [('files/libcarplayev.so',out/'libcarplayev.so'),('svc/capture.sh',R/'svc/capture.sh')]:
   target=mod/path;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(src,target)
  for entry in config['profiles']:
   profile=R/'vehicles'/entry['path'];p=json.loads(profile.read_text());target=mod/('profiles/'+entry['model'].lower()+'.json');target.parent.mkdir(exist_ok=True);shutil.copyfile(profile,target)
@@ -85,7 +84,7 @@ def main():
  # Explicit source roots; no tools, keys, host binaries, previous builds or captures.
  with tempfile.TemporaryDirectory() as t:
   source=Path(t)/name;source.mkdir()
-  for rel in ['README.md','CHANGELOG.md','LICENSE','NOTICE.md','.gitignore','release.json','mod.json','patches.json','src','stubs','recipes','svc','vehicles','packaging','tools','tests','docs','images']:
+  for rel in ['README.md','CHANGELOG.md','LICENSE','NOTICE.md','.gitignore','release.json','mod.json','patches.json','src','stubs','svc','vehicles','packaging','tools','tests','docs','images']:
    src=R/rel
    if src.is_dir():shutil.copytree(src,source/rel,ignore=shutil.ignore_patterns('.DS_Store','._*','__pycache__','*.pyc'))
    else:shutil.copyfile(src,source/rel)
