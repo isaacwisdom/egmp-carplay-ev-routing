@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Build native HMG-API releases and optional NEMESIS test wrappers. No OEM inputs."""
 from pathlib import Path
-import argparse,hashlib,json,os,shutil,subprocess,tempfile,zipfile
+import argparse,hashlib,json,os,re,shutil,subprocess,tempfile,zipfile
 R=Path(__file__).resolve().parents[1]
 def run(*args):subprocess.run(list(map(str,args)),check=True)
 def md5(p):return hashlib.md5(p.read_bytes()).hexdigest()
@@ -18,6 +18,11 @@ def compile_java(files,out,classpath,java):
 def classjar(folder,path):
  with zipfile.ZipFile(path,'w',zipfile.ZIP_DEFLATED) as z:
   for p in sorted(folder.rglob('*.class')):z.write(p,p.relative_to(folder).as_posix())
+def version_key(value):
+ m=re.fullmatch(r'(\d+)\.(\d+)\.(\d+)(?:-beta\.(\d+))?',value)
+ if not m:raise SystemExit('Unsupported HMG-API version: '+value)
+ major,minor,patch,beta=m.groups()
+ return (int(major),int(minor),int(patch),1 if beta is None else 0,int(beta or 0))
 def main():
  ap=argparse.ArgumentParser(description=__doc__)
  for arg in ('hmgapi-source','wireless-source','android-jar','d8-jar','json-jar','key'):ap.add_argument('--'+arg,required=True,type=Path)
@@ -29,14 +34,20 @@ def main():
  for p in (a.android_jar,a.d8_jar,a.json_jar,a.key):
   if not p.is_file():raise SystemExit('Missing build input: '+str(p))
  engine=up/'core/runtime/java/hmgapi/engine/Engine.java'
- if '"1.0.0-beta.6"' not in engine.read_text():raise SystemExit('Build against the reviewed HMG-API beta6 source')
+ match=re.search(r'HMGAPI_VERSION\s*=\s*"([^"]+)"',engine.read_text())
+ if not match:raise SystemExit('Could not read HMG-API version from '+str(engine))
+ if version_key(match.group(1)) < version_key(config['minimum_hmgapi']):
+  raise SystemExit('HMG-API '+match.group(1)+' is older than required '+config['minimum_hmgapi'])
  native=R/'src/native';arm=['--target=armv7a-linux-androideabi','-mthumb','-march=armv7-a','-mfloat-abi=soft','-Os','-ffreestanding','-fno-builtin','-fno-stack-protector','-fno-unwind-tables','-fno-asynchronous-unwind-tables']
+ jni_include=a.java_home/'include';jni_platform=next((p for p in jni_include.iterdir() if (p/'jni_md.h').is_file()),None)
+ if jni_platform is None:raise SystemExit('Could not find jni_md.h under '+str(jni_include))
+ jni_flags=['-I'+str(jni_include),'-I'+str(jni_platform)]
  imports=out/'link-stubs';imports.mkdir(exist_ok=True);(imports/'dl.c').write_text('void *dlopen(const char *p,int f){return 0;} void *dlsym(void *h,const char *s){return 0;}\n')
  run(a.clang,*arm,'-fPIC','-c',imports/'dl.c','-o',imports/'dl.o');run(a.lld,'-shared','-soname','libdl.so','-o',imports/'libdl.so',imports/'dl.o')
- run(a.clang,*arm,'-fPIC','-fvisibility=hidden','-I'+str(native/'compat'),'-I'+str(a.java_home/'include'),'-Wall','-Wextra','-Werror','-c',native/'bridge_jni.c','-o',out/'bridge_jni.o')
+ run(a.clang,*arm,'-fPIC','-fvisibility=hidden','-I'+str(native/'compat'),*jni_flags,'-Wall','-Wextra','-Werror','-c',native/'bridge_jni.c','-o',out/'bridge_jni.o')
  run(a.lld,'-shared','--no-undefined','--hash-style=sysv','-z','now','-soname','libcarplayev.so','--build-id=none','-o',out/'libcarplayev.so',out/'bridge_jni.o',imports/'libdl.so')
  # ARM harness artifact is not shipped; tests can execute the real JNI code offline.
- run(a.clang,*arm,'-I'+str(native/'compat'),'-I'+str(a.java_home/'include'),'-c',R/'tests/jni_imports.c','-o',out/'jni_imports.o')
+ run(a.clang,*arm,'-I'+str(native/'compat'),*jni_flags,'-c',R/'tests/jni_imports.c','-o',out/'jni_imports.o')
  run(a.lld,'-Ttext=0x02000000','-e','bridge_bind','-o',out/'bridge_jni_test.elf',out/'bridge_jni.o',out/'jni_imports.o')
  hmg=out/'hmg-classes';wireless_api=out/'wireless-api';oem=out/'oem-stubs';classes=out/'mod-classes';tests=out/'tests'
  for p in (hmg,wireless_api,oem,classes,tests):
@@ -72,9 +83,9 @@ def main():
  archive(mod,dist/(name+'.zip'));shutil.copyfile(dist/(name+'.zip'),stage/'payload/mod.zip')
  for entry in config['profiles']:
   lines.append(' '.join([entry['prefix'],entry['firmware'],'mod.zip',md5(stage/'payload/mod.zip')]))
- run(java/'java','-cp',':'.join(map(str,[hmg,tests])),'ReleasePlanHost',up,out)
+ run(java/'java','-cp',':'.join(map(str,[hmg,tests])),'ReleasePlanHost',up,out,a.wireless_source)
  (stage/'payload/profiles.tsv').write_text('\n'.join(lines)+'\n');(stage/'payload/native-md5.txt').write_text(''.join(n+' '+h+'\n' for n,h in config['native_md5'].items()))
- run(os.sys.executable,R/'tests/test-hmgapi-package.py','--java',java/'java')
+ run(os.sys.executable,R/'tests/test-hmgapi-package.py','--java',java/'java','--wireless-source',a.wireless_source)
  package=testing/(name+'-nemesis-package.zip');archive(stage,package)
  with tempfile.TemporaryDirectory() as t:
   usb=Path(t);(usb/'packages').mkdir();shutil.copyfile(package,usb/'packages'/package.name)
